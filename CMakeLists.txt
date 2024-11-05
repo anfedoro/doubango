@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(Doubango C CXX)
 
-option(GENDOC "Generate Doxygen Documentation" ON)
-option(WITH_SRTP "Secure Real-time Transport Protocol " OFF)
+option(GENDOC "Generate Doxygen Documentation" OFF)
+option(WITH_SRTP "Secure Real-time Transport Protocol " ON)
 option(WITH_OPUS "Opus audio codec" OFF)
-option(WITH_AMR "AMR audio codec" OFF)
+option(WITH_AMR "AMR audio codec" ON)
 option(WITH_FFMPEG "FFmpeg is the leading multimedia framework, able to decode, encode" OFF)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -45,8 +45,8 @@ if(GENDOC AND DOXYGEN_FOUND)
     doxygen_add_docs(api-doc ALL)
 endif()
 
-#set(CMAKE_C_FLAGS "-Wformat=0 -Wno-int-to-pointer-cast")
-#set(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
+set(CMAKE_C_FLAGS "-Wformat=0 -Wno-int-to-pointer-cast")
+set(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 enable_testing()

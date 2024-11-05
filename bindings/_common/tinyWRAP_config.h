@@ -66,4 +66,19 @@
 #include "../config.h"
 #endif
 
+/* Redefine SWIG_PYTHON_INITIALIZE_THREADS to handle Python versions >= 3.9 */
+#ifdef SWIG_PYTHON_INITIALIZE_THREADS
+    #undef SWIG_PYTHON_INITIALIZE_THREADS  // Remove SWIG definition
+#endif
+
+#ifdef PY_VERSION_HEX
+    #if PY_VERSION_HEX < 0x03090000
+        /* For Python versions before 3.9, use PyEval_InitThreads */
+        #define SWIG_PYTHON_INITIALIZE_THREADS PyEval_InitThreads()
+    #else
+        /* For Python 3.9 and newer, do nothing as threads are initialized automatically */
+        #define SWIG_PYTHON_INITIALIZE_THREADS (void)0
+    #endif
+#endif
+
 #endif // TINYWRAP_CONFIG_H
