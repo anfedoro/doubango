@@ -12,13 +12,17 @@
 #include "ProxyConsumer.h"
 #include "ProxyProducer.h"
 
+#include "ChallengeCallback.h"
+#include "SipChallenge.h"
 #include "SipCallback.h"
 #include "SafeObject.h"
 #include "SipStack.h"
+
 %}
 
 /* Callbacks */
 %feature("director") SipCallback;
+%feature("director") ChallengeCallback;
 %feature("director") ProxyPluginMgrCallback;
 %feature("director") ProxyAudioConsumerCallback;
 %feature("director") ProxyVideoConsumerCallback;
@@ -35,11 +39,13 @@
 %include "SipEvent.h"
 %include "SipSession.h"
 
+%include "SipChallenge.h"
 %include "ProxyPluginMgr.h"
 %include "ProxyConsumer.h"
 %include "ProxyProducer.h"
 
 %include "SipCallback.h"
+%include "ChallengeCallback.h"
 %include "SafeObject.h"
 %include "SipStack.h"
 %clearnodefaultctor;
@@ -77,6 +83,41 @@ typedef enum tsip_request_type_e
 }
 tsip_request_type_t;
 
+
+/* ====== From "tinySIP\include\tinysip\tsip_challenge.h"  ====== */
+#define AKA_CK_SIZE 16
+#define AKA_IK_SIZE 16
+#define TSK_MD5_STRING_SIZE 32
+
+typedef uint8_t AKA_CK_T[AKA_CK_SIZE + 1];
+typedef uint8_t AKA_IK_T[AKA_IK_SIZE + 1];
+typedef char tsk_md5string_t[TSK_MD5_STRING_SIZE + 1];
+
+typedef struct tsip_challenge_s
+{
+	TSK_DECLARE_OBJECT;
+
+	const tsip_stack_handle_t *stack;
+
+	tsk_bool_t isproxy;
+
+	char* username;
+	char* scheme;
+	char* realm;
+	char* nonce;
+	char* opaque;
+	char* algorithm;
+	const char* qop;
+
+	char* ha1_hexstr;
+
+	AKA_CK_T ck;
+	AKA_IK_T ik;
+
+	tsk_md5string_t cnonce;
+	unsigned nc;
+}
+tsip_challenge_t;
 
 /* ====== From "tinySIP\include\tinysip\tsip_event.h"  ====== */
 typedef enum tsip_event_type_e

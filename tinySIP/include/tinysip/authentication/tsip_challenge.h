@@ -83,6 +83,24 @@ int tsip_challenge_update(tsip_challenge_t *self, const char* scheme, const char
 TINYSIP_API tsip_header_t *tsip_challenge_create_header_authorization(tsip_challenge_t *self, const tsip_request_t *request);
 tsip_header_t *tsip_challenge_create_empty_header_authorization(const char* username, const char* realm, const char* uristring);
 
+// Callback function definition for tinyWARP
+
+#ifndef TSIP_CHALLENGE_H
+#define TSIP_CHALLENGE_H
+
+#include "tsk_object.h" // и другие необходимые заголовки
+
+// callback function definition
+typedef int (*aka_res_callback_t)(tsip_challenge_t *self, const char* password, char** result);
+
+// global pointer to callback function
+extern aka_res_callback_t aka_res_callback;
+
+// function to set callback function
+aka_res_callback_t set_aka_res_callback(aka_res_callback_t callback);
+
+#endif // TSIP_CHALLENGE_H
+
 TINYSIP_GEXTERN const tsk_object_def_t *tsip_challenge_def_t;
 
 TSIP_END_DECLS

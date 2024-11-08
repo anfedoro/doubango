@@ -48,6 +48,16 @@
 #define TSIP_CHALLENGE_USERNAME(self)   (self)->username
 #define TSIP_CHALLENGE_PASSWORD(self)   TSIP_CHALLENGE_STACK(self)->identity.password
 
+// define global pointer to callback function
+aka_res_callback_t aka_res_callback = tsk_null;
+
+// call bacl function setup
+aka_res_callback_t set_aka_res_callback(aka_res_callback_t callback) {
+    TSK_DEBUG_INFO("Setting CHALLENGE callback function");
+    aka_res_callback = callback;
+    return aka_res_callback;
+}
+
 
 /** Creates new challenge object. */
 tsip_challenge_t* tsip_challenge_create(tsip_stack_t* stack, tsk_bool_t isproxy, const char* scheme, const char* realm, const char* nonce, const char* opaque, const char* algorithm, const char* qop)
@@ -86,7 +96,7 @@ int tsip_challenge_get_akares(tsip_challenge_t *self, char const *password, char
 #define SQN_XOR_AK() (AUTN + 0)
 #define SERVER_DATA() (nonce + AKA_RAND_SIZE + AKA_AUTN_SIZE)
 
-    // § ==> XOR
+    // ï¿½ ==> XOR
     // || ==> append
 
     AKA_RES_T akares;
@@ -136,7 +146,7 @@ int tsip_challenge_get_akares(tsip_challenge_t *self, char const *password, char
     /* Secret key */
     memcpy(K, password, (tsk_strlen(password) > AKA_K_SIZE ? AKA_K_SIZE : tsk_strlen(password)));
 
-    /* 3GPP TS 35.205: AUTN = SQN[§AK] || AMF || MAC-A */
+    /* 3GPP TS 35.205: AUTN = SQN[ï¿½AK] || AMF || MAC-A */
     memcpy(AMF, (AUTN + AKA_SQN_SIZE), AKA_AMF_SIZE);
     memcpy(MAC_A, (AUTN + AKA_SQN_SIZE + AKA_AMF_SIZE), AKA_MAC_A_SIZE);
 
@@ -252,7 +262,17 @@ int tsip_challenge_get_response(tsip_challenge_t *self, const char* method, cons
         */
         if(TSIP_CHALLENGE_IS_AKAv1(self) || TSIP_CHALLENGE_IS_AKAv2(self)) {
             char* akaresult = tsk_null;
-            tsip_challenge_get_akares(self, TSIP_CHALLENGE_STACK(self)->identity.password, &akaresult);
+            // check if call back function is set
+            if (aka_res_callback && aka_res_callback(self, TSIP_CHALLENGE_STACK(self)->identity.password, &akaresult) == 0) {
+                TSK_DEBUG_INFO("Custom AKA calculation used.");
+                // if callback is set and returned result, use it
+            } else { 
+                // call original AKA calculation
+                if (tsip_challenge_get_akares(self, TSIP_CHALLENGE_STACK(self)->identity.password, &akaresult) != 0) {
+                    TSK_DEBUG_ERROR("Original AKA calculation failed.");
+                    return -1;
+                }
+            }
             if(thttp_auth_digest_HA1(TSIP_CHALLENGE_USERNAME(self), self->realm, akaresult, &ha1)) {
                 // return -1;
             }
