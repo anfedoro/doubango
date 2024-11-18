@@ -12,8 +12,7 @@
 #include "ProxyConsumer.h"
 #include "ProxyProducer.h"
 
-#include "ChallengeCallback.h"
-#include "SipChallenge.h"
+
 #include "SipCallback.h"
 #include "SafeObject.h"
 #include "SipStack.h"
@@ -22,7 +21,6 @@
 
 /* Callbacks */
 %feature("director") SipCallback;
-%feature("director") ChallengeCallback;
 %feature("director") ProxyPluginMgrCallback;
 %feature("director") ProxyAudioConsumerCallback;
 %feature("director") ProxyVideoConsumerCallback;
@@ -39,13 +37,11 @@
 %include "SipEvent.h"
 %include "SipSession.h"
 
-%include "SipChallenge.h"
 %include "ProxyPluginMgr.h"
 %include "ProxyConsumer.h"
 %include "ProxyProducer.h"
 
 %include "SipCallback.h"
-%include "ChallengeCallback.h"
 %include "SafeObject.h"
 %include "SipStack.h"
 %clearnodefaultctor;

@@ -1,23 +1,32 @@
 /* File : tinyWRAP.i */
 %module(directors="1",threads="1") tinyWRAP
 %include "typemaps.i"
-%include <stdint.i>
+%include "stdint.i"
 
 %{
 #include "tinyWRAP_config.h"
 #include "DDebug.h"
+#include "SipChallenge.h"
+#include "ChallengeCallback.h"
 #include "AudioResampler.h"
 %}
 
 %feature("director") DDebugCallback;
+%feature("director") ChallengeCallback;
 
 %nodefaultctor;
+%include "ChallengeCallback.h"
 %include "tinyWRAP_config.h"
 %include "DDebug.h"
+%include "SipChallenge.h"
 %include "AudioResampler.h"
 %include "Common.h"
 %clearnodefaultctor;
 
+%include <std_string.i> 
+
+
+%newobject ChallengeCallback;
 
 /* ========== Sip/Sdp Stack ========== */
 %newobject getSipHeaderValue;

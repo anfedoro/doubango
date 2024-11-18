@@ -51,6 +51,7 @@ typedef char thttp_auth_ws_keystring_t[255];
 TINYHTTP_API tsk_size_t thttp_auth_basic_response(const char* userid, const char* password, char** response);
 
 TINYHTTP_API int thttp_auth_digest_HA1(const char* username, const char* realm, const char* password, tsk_md5string_t* ha1);
+TINYHTTP_API int thttp_auth_digest_HA1_AKA(const char* username, const char* realm, const char* password, tsk_md5string_t* ha1);
 TINYHTTP_API int thttp_auth_digest_HA1sess(const char* username, const char* realm, const char* password, const char* nonce, const char* cnonce, tsk_md5string_t* ha1sess);
 
 TINYHTTP_API int thttp_auth_digest_HA2(const char* method, const char* url, const tsk_buffer_t* entity_body, const char* qop, tsk_md5string_t* ha2);

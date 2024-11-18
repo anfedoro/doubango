@@ -1,7 +1,22 @@
 #include "SipChallenge.h"
-#include <cstring>  // for memcpy
 
-SipChallenge::SipChallenge(tsip_challenge_t* challenge) : challenge_(challenge) {}
+
+SipChallenge::SipChallenge(tsip_challenge_t* challenge){
+    challenge_ = challenge;
+
+    TSK_DEBUG_INFO("SipChallenge created");
+    // Print SIP Challenge Content
+    TSK_DEBUG_INFO("SIP Challenge data content:");
+    TSK_DEBUG_INFO("\tScheme: %s", this->getScheme());
+    TSK_DEBUG_INFO("\tRealm: %s", this->getRealm());
+    TSK_DEBUG_INFO("\tNonce: %s", this->getNonce());
+    TSK_DEBUG_INFO("\tOpaque: %s", this->getOpaque());
+    TSK_DEBUG_INFO("\tAlgorithm: %s", this->getAlgorithm());
+    TSK_DEBUG_INFO("\tQop: %s", this->getQop());
+    TSK_DEBUG_INFO("\tUsername: %s", this->getUsername());
+    TSK_DEBUG_INFO("\tHa1Hexstr: %s", this->getHa1Hexstr());
+    
+}
 
 const SipStack* SipChallenge::getStack() const {
     return static_cast<const SipStack*>(challenge_->stack);
@@ -39,47 +54,23 @@ const char* SipChallenge::getHa1Hexstr() const {
     return challenge_->ha1_hexstr;
 }
 
-// Getter for CK
-void SipChallenge::getCK(AKA_CK_T& ck_out) const {
-    if (challenge_) {
-        std::memcpy(ck_out, challenge_->ck, AKA_CK_SIZE + 1);
-    }
-}
 
 // Setter for CK
-void SipChallenge::setCK(const AKA_CK_T& ck) {
+void SipChallenge::setCK(char* ck) {
     if (challenge_) {
-        std::memcpy(challenge_->ck, ck, AKA_CK_SIZE + 1);
+        tsk_str_to_hex(ck, AKA_CK_SIZE *2, challenge_->ck);
     }
 }
 
-// Getter for IK
-void SipChallenge::getIK(AKA_IK_T& ik_out) const {
-    if (challenge_) {
-        std::memcpy(ik_out, challenge_->ik, AKA_IK_SIZE + 1);
-    }
-}
+
 
 // Setter for IK
-void SipChallenge::setIK(const AKA_IK_T& ik) {
+void SipChallenge::setIK(char * ik) {
     if (challenge_) {
-        std::memcpy(challenge_->ik, ik, AKA_IK_SIZE + 1);
+        tsk_str_to_hex(ik, AKA_IK_SIZE *2, challenge_->ik);
     }
 }
 
-// // Getter for Cnonce
-// void SipChallenge::getCnonce(tsk_md5string_t& cnonce_out) const {
-//     if (challenge_) {
-//         std::memcpy(cnonce_out, challenge_->cnonce, TSK_MD5_STRING_SIZE + 1);
-//     }
-// }
-
-// // Setter for Cnonce
-// void SipChallenge::setCnonce(const tsk_md5string_t& cnonce) {
-//     if (challenge_) {
-//         std::memcpy(challenge_->cnonce, cnonce, TSK_MD5_STRING_SIZE + 1);
-//     }
-// }
 
 // Setter for Ha1Hexstr
 bool SipChallenge::setHa1HexStr(const char* ha1_hexstr) {

@@ -23,7 +23,6 @@
 
 #include "SipSession.h"
 #include "SipEvent.h"
-#include "SipChallenge.h"
 
 #include "DDebug.h"
 
@@ -38,15 +37,13 @@ bool SipStack::g_bInitialized = false;
 
 /* === ANSI-C functions (local use) === */
 static int stack_callback(const tsip_event_t *sipevent);
-static int challenge_callback(tsip_challenge_t *self, const char *password, char **result);
 static int session_handle_event(const tsip_event_t *sipevent);
 
 SipStack::SipStack(SipCallback* pCallback, const char* realm_uri, const char* impi_uri, const char* impu_uri)
     :SafeObject()
 {
     m_pCallback = pCallback;
-    m_aka_res_callback = challenge_callback;
-    m_pChallengeCallback = NULL;
+    
 
     /* Initialize network and media layers */
     if(!SipStack::initialize()) {
@@ -444,70 +441,12 @@ bool SipStack::isCodecSupported(tdav_codec_id_t codec_id)
     return tdav_codec_is_supported(codec_id) ? true : false;
 }
 
-bool SipStack::setChallengeCallback(ChallengeCallback* callback)
-{
-    if(callback) {
-        m_aka_res_callback = set_aka_res_callback(challenge_callback);
-    }
-    else {
-        m_aka_res_callback = set_aka_res_callback(tsk_null);
-    }   
-    return (m_aka_res_callback != tsk_null);
-}
 
 
-static int challenge_callback(tsip_challenge_t *self, const char *password, char **result)
-{
-    int ret = 0;
-    TSK_DEBUG_INFO("Challenge callback called");
-
-    SipChallenge* challenge = new SipChallenge(self);
-    TSK_DEBUG_INFO("SipChallenge created");
-    // Print SIP Challenge Content
-    TSK_DEBUG_INFO("SIP Challenge data content:");
-    TSK_DEBUG_INFO("\tScheme: %s", challenge->getScheme());
-    TSK_DEBUG_INFO("\tRealm: %s", challenge->getRealm());
-    TSK_DEBUG_INFO("\tNonce: %s", challenge->getNonce());
-    TSK_DEBUG_INFO("\tOpaque: %s", challenge->getOpaque());
-    TSK_DEBUG_INFO("\tAlgorithm: %s", challenge->getAlgorithm());
-    TSK_DEBUG_INFO("\tQop: %s", challenge->getQop());
-    TSK_DEBUG_INFO("\tUsername: %s", challenge->getUsername());
-    TSK_DEBUG_INFO("\tHa1Hexstr: %s", challenge->getHa1Hexstr());
-
-
-    const SipStack* sipStack = static_cast<const SipStack*>(self->stack);
-    if(!sipStack) {
-        TSK_DEBUG_ERROR("Invalid SIP challenge (Stack is Null).");
-        return -2;
-    }
-    else {
-        TSK_DEBUG_INFO("SipStack created");
-    }
-
-
-    ChallengeCallback* ch_cb = sipStack->getChallengeCallback();
-    if(!ch_cb) {
-        TSK_DEBUG_ERROR("Callback not registered");
-        return -3;
-    }
-    else {
-        TSK_DEBUG_INFO("Callback registered");
-    }
-
-    ret = ch_cb->OnChallengeCallback(challenge, password, result);
-    
-    
-
-    if(challenge) {
-        delete challenge;
-    }
-    
-    return ret;
-}
 
 static int stack_callback(const tsip_event_t *sipevent)
 {
-    /* CHALLENGE CALCULATION was called */
+    
     int ret = 0;
     const SipEvent* e = tsk_null;
 

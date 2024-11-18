@@ -88,16 +88,21 @@ tsip_header_t *tsip_challenge_create_empty_header_authorization(const char* user
 #ifndef TSIP_CHALLENGE_H
 #define TSIP_CHALLENGE_H
 
-#include "tsk_object.h" // и другие необходимые заголовки
+#include "tsk_object.h" 
 
 // callback function definition
-typedef int (*aka_res_callback_t)(tsip_challenge_t *self, const char* password, char** result);
+typedef int (*tsip_challenge_callback_t)(tsip_challenge_t *self, const char* password, char** result);
 
-// global pointer to callback function
-extern aka_res_callback_t aka_res_callback;
+// global pointer to callback function and data
+static const void* tsip_challenge_data = tsk_null; //further pointer on ChallengeCallback object
+static tsip_challenge_callback_t tsip_challenge_callback = tsk_null; //further pointer on callback function
 
-// function to set callback function
-aka_res_callback_t set_aka_res_callback(aka_res_callback_t callback);
+
+// function to set and get callback function and data
+void tsip_set_challenge_data(const void*);
+void* tsip_get_challenge_data();
+void tsip_set_challenge_callback(tsip_challenge_callback_t callback);
+tsip_challenge_callback_t tsip_get_challenge_callback();
 
 #endif // TSIP_CHALLENGE_H
 

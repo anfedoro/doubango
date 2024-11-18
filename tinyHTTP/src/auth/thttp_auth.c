@@ -22,12 +22,14 @@
  */
 #include "tinyhttp/auth/thttp_auth.h"
 
+
 #include "tsk_string.h"
 #include "tsk_sha1.h"
 #include "tsk_base64.h"
 #include "tsk_buffer.h"
 #include "tsk_memory.h"
 #include "tsk_debug.h"
+
 
 #include <string.h>
 
@@ -75,6 +77,23 @@ tsk_size_t thttp_auth_basic_response(const char* userid, const char* password, c
  *
  * @return  Zero if succeed and non-zero error code otherwise.
  **/
+int thttp_auth_digest_HA1_AKA(const char* username, const char* realm, const char* password, tsk_md5string_t* ha1)
+{
+    int ret;
+
+    /* RFC 2617 - 3.2.2.2 A1
+        A1       = unq(username-value) ":" unq(realm-value) ":" passwd, where passwd is AKA digest challenge result
+        */
+    char *a1_1 = tsk_null;
+    tsk_sprintf(&a1_1, "%s:%s:", username, realm);
+    char *a1 = tsk_calloc(1, tsk_strlen(a1_1) + 8);
+    memcpy(a1, a1_1, tsk_strlen(a1_1));
+    memcpy(a1 + tsk_strlen(a1_1), password, 8);
+    ret = tsk_md5compute(a1, tsk_strlen(a1_1) + 8, ha1);
+    TSK_FREE(a1);
+
+    return ret;
+}
 int thttp_auth_digest_HA1(const char* username, const char* realm, const char* password, tsk_md5string_t* ha1)
 {
     int ret;
@@ -89,7 +108,6 @@ int thttp_auth_digest_HA1(const char* username, const char* realm, const char* p
 
     return ret;
 }
-
 /**@ingroup thttp_auth_group
  *
  * Generates digest HA1 value for 'MD5-sess' algo as per RFC 2617 subclause 3.2.2.2.

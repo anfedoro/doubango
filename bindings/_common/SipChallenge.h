@@ -27,16 +27,10 @@ public:
     const char* getUsername() const;
     const char* getHa1Hexstr() const;
 
+    void setCK(char* ck);
 
-    // Use methods for working with CK and IK arrays
-    void getCK(AKA_CK_T& ck_out) const;
-    void setCK(const AKA_CK_T& ck);
+    void setIK(char* ik);
 
-    void getIK(AKA_IK_T& ik_out) const;
-    void setIK(const AKA_IK_T& ik);
-
-    // void getCnonce(tsk_md5string_t& cnonce_out) const;
-    // void setCnonce(const tsk_md5string_t& cnonce);
 
     bool setHa1HexStr(const char* ha1_hexstr);
 

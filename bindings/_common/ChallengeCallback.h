@@ -19,26 +19,36 @@
 * along with DOUBANGO.
 *
 */
+
+#include "tinysip/authentication/tsip_challenge.h"
+#include "tinysip/authentication/tsip_milenage.h"
+#include <vector>
+
 #ifndef TINYWRAP_CHALLENGE_CALLBACK_H
 #define TINYWRAP_CHALLENGE_CALLBACK_H
 
-#include "tinysip.h"
-
 class SipChallenge;
-
 
 class ChallengeCallback
 {
 public:
-    ChallengeCallback() { }
-    virtual ~ChallengeCallback() {}
-    virtual int OnChallengeCallback(SipChallenge* challenge, const char* password, char** result)
+    ChallengeCallback();
+    virtual ~ChallengeCallback();
+
+    virtual const char* onChallengeCallback(SipChallenge* challenge, const char* password) 
     {
-        TSK_DEBUG_INFO("Default Virtual Challenge callback called");
-        return -1;
+        TSK_DEBUG_INFO("*** Virtual onChallengeCallback called");
+        return tsk_null;
     }
-    
+
+#if !defined(SWIG)
+public:
+    static int challenge_cb(tsip_challenge_t* challenge, const char* password, char** result);
+
+#endif
+
 private:
+
 
 };
 

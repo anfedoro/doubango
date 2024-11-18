@@ -26,12 +26,10 @@
 
 #include "SipCallback.h"
 #include "SafeObject.h"
-#include "ChallengeCallback.h"
 
 #include "tinydav/tdav.h"
 #include "tinysip.h"
 #include "tinyhttp.h"
-#include "tinysip/authentication/tsip_challenge.h"
 
 class DDebugCallback;
 
@@ -55,7 +53,6 @@ public: /* API functions */
     bool setLocalIP(const char* ip, const char* transport=tsk_null);
     bool setLocalPort(unsigned short port, const char* transport=tsk_null);
     bool setEarlyIMS(bool enabled);
-    bool setChallengeCallback(ChallengeCallback* callback);
     bool addHeader(const char* name, const char* value);
     bool removeHeader(const char* name);
     bool addDnsServer(const char* ip);
@@ -109,20 +106,14 @@ public: /* Public helper function */
     {
         return m_pCallback;
     }
-    inline ChallengeCallback* getChallengeCallback()const
-    {
-        return m_pChallengeCallback;
-    }
 
 
 #endif
 
 private:
     SipCallback* m_pCallback;
-    ChallengeCallback* m_pChallengeCallback;
     tsip_stack_handle_t* m_pHandle;
     tsk_plugin_s* m_ipsec;
-    aka_res_callback_t m_aka_res_callback;
     static bool g_bInitialized;
 };
 

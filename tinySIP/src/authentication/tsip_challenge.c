@@ -48,14 +48,28 @@
 #define TSIP_CHALLENGE_USERNAME(self)   (self)->username
 #define TSIP_CHALLENGE_PASSWORD(self)   TSIP_CHALLENGE_STACK(self)->identity.password
 
-// define global pointer to callback function
-aka_res_callback_t aka_res_callback = tsk_null;
 
-// call bacl function setup
-aka_res_callback_t set_aka_res_callback(aka_res_callback_t callback) {
-    TSK_DEBUG_INFO("Setting CHALLENGE callback function");
-    aka_res_callback = callback;
-    return aka_res_callback;
+
+// set callback function and challenge object 
+void tsip_set_challenge_callback(tsip_challenge_callback_t callback) {
+    if(callback)
+        TSK_DEBUG_INFO("Setting CHALLENGE callback function");
+    tsip_challenge_callback = callback;    
+}
+
+void tsip_set_challenge_data(const void* data) {
+    if(data)
+        TSK_DEBUG_INFO("Setting CHALLENGE callback data");
+    tsip_challenge_data = data;
+}
+
+// get the callback function and challenge object
+tsip_challenge_callback_t tsip_get_challenge_callback() {
+    return tsip_challenge_callback;
+}
+
+void* tsip_get_challenge_data() {
+    return tsip_challenge_data;
 }
 
 
@@ -233,7 +247,6 @@ int tsip_challenge_get_akares(tsip_challenge_t *self, char const *password, char
     else {
         *result = tsk_calloc(1, AKA_RES_SIZE + 1);
         memcpy(*result, akares, AKA_RES_SIZE);
-
         ret = 0;
     }
 
@@ -263,7 +276,7 @@ int tsip_challenge_get_response(tsip_challenge_t *self, const char* method, cons
         if(TSIP_CHALLENGE_IS_AKAv1(self) || TSIP_CHALLENGE_IS_AKAv2(self)) {
             char* akaresult = tsk_null;
             // check if call back function is set
-            if (aka_res_callback && aka_res_callback(self, TSIP_CHALLENGE_STACK(self)->identity.password, &akaresult) == 0) {
+            if (tsip_challenge_callback && tsip_challenge_callback(self, TSIP_CHALLENGE_STACK(self)->identity.password, &akaresult) == 0) {
                 TSK_DEBUG_INFO("Custom AKA calculation used.");
                 // if callback is set and returned result, use it
             } else { 
@@ -273,7 +286,7 @@ int tsip_challenge_get_response(tsip_challenge_t *self, const char* method, cons
                     return -1;
                 }
             }
-            if(thttp_auth_digest_HA1(TSIP_CHALLENGE_USERNAME(self), self->realm, akaresult, &ha1)) {
+            if(thttp_auth_digest_HA1_AKA(TSIP_CHALLENGE_USERNAME(self), self->realm, akaresult, &ha1)) {
                 // return -1;
             }
             TSK_FREE(akaresult);
@@ -291,13 +304,12 @@ int tsip_challenge_get_response(tsip_challenge_t *self, const char* method, cons
 
         /* ===
             HA2
-        */
+        */  
         thttp_auth_digest_HA2(method,
                               uristring,
                               entity_body,
                               self->qop,
                               &ha2);
-
         /* RESPONSE */
         if(self->nc) {
             THTTP_NCOUNT_2_STRING(self->nc, nc);
