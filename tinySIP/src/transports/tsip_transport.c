@@ -479,6 +479,28 @@ tsk_size_t tsip_transport_send_raw_ws(const tsip_transport_t* self, tnet_fd_t lo
     return ret;
 }
 
+/* set SipMessageCallback objest pointer */
+void tsip_set_message_callback_data(const void* data){
+    tsip_message_callback_data = data;
+    return;
+}
+
+/** get SipMessageCallback objest pointer */
+void* tsip_get_message_callback_data(){
+    return tsip_message_callback_data;
+}
+
+/* set SipMessageCallback function pointer */
+void tsip_set_message_callback(tsip_message_callback_t callback){
+    tsip_message_callback = callback;
+    return;
+}
+
+/* get SipMessageCallback function pointer */
+tsip_message_callback_t tsip_get_message_callback(){
+    return tsip_message_callback;
+}
+
 /* sends a request
 * all callers of this function should provide a sigcomp-id
 */
@@ -526,9 +548,15 @@ tsk_size_t tsip_transport_send(const tsip_transport_t* self, const char *branch,
                 msg->firstVia->rport = msg->firstVia->port;
             }
         }
-
+        
+        
         if((buffer = tsk_buffer_create_null())) {
             tsip_message_tostring(msg, buffer);
+
+        if(tsip_message_callback){
+            tsip_message_callback(msg, &buffer);
+            TSK_DEBUG_INFO("Sip message callback called");
+        }
 
             TSK_DEBUG_INFO("\nSEND: %.*s\n", (int)buffer->size, (const char*)buffer->data);
 

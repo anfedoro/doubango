@@ -8,15 +8,19 @@
 #include "DDebug.h"
 #include "SipChallenge.h"
 #include "ChallengeCallback.h"
+#include "SipMessageCallback.h"
 #include "AudioResampler.h"
 %}
 
 %feature("director") DDebugCallback;
 %feature("director") ChallengeCallback;
+%feature("director") SipMessageCallback;
+
 
 %nodefaultctor;
-%include "ChallengeCallback.h"
 %include "tinyWRAP_config.h"
+%include "ChallengeCallback.h"
+%include "SipMessageCallback.h"
 %include "DDebug.h"
 %include "SipChallenge.h"
 %include "AudioResampler.h"
@@ -27,6 +31,8 @@
 
 
 %newobject ChallengeCallback;
+%newobject SipMessageCallback;
+
 
 /* ========== Sip/Sdp Stack ========== */
 %newobject getSipHeaderValue;

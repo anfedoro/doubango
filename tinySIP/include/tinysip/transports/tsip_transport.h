@@ -123,6 +123,27 @@ typedef struct tsip_transport_s {
 }
 tsip_transport_t;
 
+
+#ifndef TSIP_MSG_CALLBACK_H
+#define TSIP_MSG_CALLBACK_H
+
+#include "tsk_object.h" 
+
+// callback function definition
+typedef int (*tsip_message_callback_t)(tsip_message_t *self, tsk_buffer_t **buffer);
+
+// global pointer to callback function and data
+static const void* tsip_message_callback_data = tsk_null; //further pointer on SipMessageCallback object
+static tsip_message_callback_t tsip_message_callback = tsk_null; //further pointer on callback function
+
+// function to set and get callback function and data
+void tsip_set_message_callback_data(const void* data);
+void* tsip_get_message_callback_data();
+void tsip_set_message_callback(tsip_message_callback_t callback);
+tsip_message_callback_t tsip_get_message_callback();
+
+#endif // TSIP_MSG_CALLBACK_H
+
 #define TSIP_DECLARE_TRANSPORT tsip_transport_t __transport__
 typedef tsk_list_t tsip_transports_L_t; /**< List of @ref tsip_transport_t elements. */
 
