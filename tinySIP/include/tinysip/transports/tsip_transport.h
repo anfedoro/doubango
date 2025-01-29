@@ -130,7 +130,7 @@ tsip_transport_t;
 #include "tsk_object.h" 
 
 // callback function definition
-typedef int (*tsip_message_callback_t)(tsip_message_t *self, tsk_buffer_t **buffer);
+typedef int (*tsip_message_callback_t)(tsip_message_t *self, void** data, tsk_size_t *size);
 
 // global pointer to callback function and data
 static const void* tsip_message_callback_data = tsk_null; //further pointer on SipMessageCallback object

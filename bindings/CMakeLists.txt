@@ -23,7 +23,7 @@ if(SWIG_FOUND)
         file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/python/setup.py [[
 from setuptools import setup
 setup(name='tinyWRAP',
-    version='1.0',
+    version='1.1',
     py_modules=['tinyWRAP'],
     packages=[''],
     package_dir={'': '.'},
@@ -41,22 +41,22 @@ setup(name='tinyWRAP',
 
         # Modify installation to use the wheel
         install(CODE "
-            if(EXISTS \"${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.0-py3-none-any.whl\")
+            if(EXISTS \"${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.1-py3-none-any.whl\")
                 execute_process(
-                    COMMAND ${Python_EXECUTABLE} -m pip install --force-reinstall \"${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.0-py3-none-any.whl\"
+                    COMMAND ${Python_EXECUTABLE} -m pip install --force-reinstall \"${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.1-py3-none-any.whl\"
                     RESULT_VARIABLE pip_result
                 )
                 if(NOT pip_result EQUAL 0)
                     message(FATAL_ERROR \"Failed to install wheel package\")
                 endif()
             else()
-                message(FATAL_ERROR \"Wheel file not found at ${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.0-py3-none-any.whl\")
+                message(FATAL_ERROR \"Wheel file not found at ${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.1-py3-none-any.whl\")
             endif()
         ")
         
         # Add installation of the wheel file
         install(
-            FILES ${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.0-py3-none-any.whl
+            FILES ${CMAKE_CURRENT_BINARY_DIR}/python/dist/tinyWRAP-1.1-py3-none-any.whl
             DESTINATION wheels
             COMPONENT python
             OPTIONAL

@@ -552,10 +552,10 @@ tsk_size_t tsip_transport_send(const tsip_transport_t* self, const char *branch,
         
         if((buffer = tsk_buffer_create_null())) {
             tsip_message_tostring(msg, buffer);
-
-        if(tsip_message_callback){
-            tsip_message_callback(msg, &buffer);
-            TSK_DEBUG_INFO("Sip message callback called");
+            
+        if(tsip_get_message_callback()){
+            tsip_message_callback(msg, &buffer->data, &buffer->size);
+            TSK_DEBUG_INFO("Outgoing SIP message callback called");
         }
 
             TSK_DEBUG_INFO("\nSEND: %.*s\n", (int)buffer->size, (const char*)buffer->data);

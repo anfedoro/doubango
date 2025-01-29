@@ -140,6 +140,13 @@ static int tsip_transport_layer_stream_cb(const tnet_transport_event_t* e)
     switch(e->type) {
     case event_data: {
         TSK_DEBUG_INFO("\nRECV:%.*s\n", (int)e->size, (const char*)e->data);
+        
+        tsip_message_callback_t msg_callback = tsip_get_message_callback();
+        if(msg_callback){
+            msg_callback(tsk_null, &e->data, &e->size);
+            TSK_DEBUG_INFO("Incoming SIP message callback called");
+        }
+
         transport->connectedFD = e->local_fd;
         break;
     }
@@ -659,6 +666,13 @@ static int tsip_transport_layer_dgram_cb(const tnet_transport_event_t* e)
     switch(e->type) {
     case event_data: {
         TSK_DEBUG_INFO("\nRECV:%.*s\n", (int)e->size, (const char*)e->data);
+        
+        tsip_message_callback_t msg_callback = tsip_get_message_callback();
+        if(msg_callback){
+            msg_callback(tsk_null, &e->data, &e->size);
+            TSK_DEBUG_INFO("Incoming SIP message callback called");
+        }
+
         break;
     }
     case event_closed:
